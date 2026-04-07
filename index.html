@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplikasi Tahfidz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+
+body {
+background: linear-gradient(135deg,#1d2671,#c33764);
+min-height: 100vh;
+color: white;
+}
+
+.container {
+width: 90%;
+max-width: 1200px;
+margin: auto;
+padding: 20px;
+}
+
+header {
+text-align: center;
+margin-bottom: 30px;
+}
+
+header h1 {
+font-size: 32px;
+}
+
+.card {
+background: rgba(255,255,255,0.1);
+backdrop-filter: blur(10px);
+border-radius: 15px;
+padding: 20px;
+margin-bottom: 20px;
+}
+
+input, button {
+width: 100%;
+padding: 10px;
+margin-top: 8px;
+border-radius: 8px;
+border: none;
+}
+
+button {
+background: #ffd369;
+cursor: pointer;
+font-weight: bold;
+}
+
+table {
+width: 100%;
+margin-top: 15px;
+border-collapse: collapse;
+}
+
+th, td {
+padding: 10px;
+text-align: center;
+border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.hapus {
+background: red;
+color: white;
+padding: 5px 10px;
+border-radius: 6px;
+cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<h1>📖 Tahfidz Qur'an</h1>
+<p>Sabaq • Sabqi • Manzil</p>
+</header>
+
+<div class="card">
+<h2>Input Hafalan</h2>
+
+<form id="form">
+<input type="date" id="tanggal" required>
+<input type="text" id="nama" placeholder="Nama Santri" required>
+<input type="text" id="sabaq" placeholder="Sabaq">
+<input type="text" id="sabqi" placeholder="Sabqi">
+<input type="text" id="manzil" placeholder="Manzil">
+<button type="submit">Tambah</button>
+</form>
+
+</div>
+
+<div class="card">
+<h2>Data</h2>
+
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Tanggal</th>
+<th>Nama</th>
+<th>Sabaq</th>
+<th>Sabqi</th>
+<th>Manzil</th>
+<th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="tbody"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<script>
+// AUTO TANGGAL
+let today = new Date().toISOString().split("T")[0];
+document.getElementById("tanggal").value = today;
+
+// DATA STORAGE
+let data = JSON.parse(localStorage.getItem("tahfidz")) || [];
+
+// RENDER
+function render() {
+let tbody = document.getElementById("tbody");
+tbody.innerHTML = "";
+
+data.forEach((item, index) => {
+let row = `
+<tr>
+<td>${index+1}</td>
+<td>${item.tanggal}</td>
+<td>${item.nama}</td>
+<td>${item.sabaq}</td>
+<td>${item.sabqi}</td>
+<td>${item.manzil}</td>
+<td><button class="hapus" onclick="hapus(${index})">Hapus</button></td>
+</tr>
+`;
+tbody.innerHTML += row;
+});
+}
+
+// TAMBAH DATA
+document.getElementById("form").addEventListener("submit", function(e){
+e.preventDefault();
+
+let item = {
+tanggal: document.getElementById("tanggal").value,
+nama: document.getElementById("nama").value,
+sabaq: document.getElementById("sabaq").value,
+sabqi: document.getElementById("sabqi").value,
+manzil: document.getElementById("manzil").value
+};
+
+data.push(item);
+localStorage.setItem("tahfidz", JSON.stringify(data));
+
+this.reset();
+document.getElementById("tanggal").value = today;
+
+render();
+});
+
+// HAPUS
+function hapus(index){
+data.splice(index,1);
+localStorage.setItem("tahfidz", JSON.stringify(data));
+render();
+}
+
+// SEARCH
+document.getElementById("search").addEventListener("keyup", function(){
+let keyword = this.value.toLowerCase();
+let rows = document.querySelectorAll("#tbody tr");
+
+rows.forEach(row => {
+let nama = row.children[2].innerText.toLowerCase();
+row.style.display = nama.includes(keyword) ? "" : "none";
+});
+});
+
+// INIT
+render();
+</script>
+
+</body>
+</html>
